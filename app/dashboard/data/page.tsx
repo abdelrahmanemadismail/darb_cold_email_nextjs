@@ -113,7 +113,6 @@ export default function DataPage() {
         <TabsList>
           <TabsTrigger value="companies">Companies</TabsTrigger>
           <TabsTrigger value="contacts">Contacts</TabsTrigger>
-          <TabsTrigger value="industries">Industries</TabsTrigger>
         </TabsList>
 
         <TabsContent value="companies" className="space-y-4">
@@ -257,14 +256,6 @@ export default function DataPage() {
                   ))}
                 </TableBody>
               </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="industries">
-          <Card>
-            <CardContent className="pt-6">
-              <p className="text-muted-foreground">Industries view coming soon...</p>
             </CardContent>
           </Card>
         </TabsContent>
