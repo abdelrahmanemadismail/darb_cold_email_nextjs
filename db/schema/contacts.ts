@@ -37,7 +37,7 @@ export const contacts = pgTable('contacts', {
   // Audit fields
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  createdBy: uuid('created_by'),
+  createdBy: varchar('created_by', { length: 255 }),
   lastContactedAt: timestamp('last_contacted_at'),
 });
 

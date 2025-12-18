@@ -21,7 +21,7 @@ export const companies = pgTable('companies', {
   // Audit fields
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
-  createdBy: uuid('created_by'),
+  createdBy: varchar('created_by', { length: 255 }),
 });
 
 export type Company = typeof companies.$inferSelect;

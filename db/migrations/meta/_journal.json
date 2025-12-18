@@ -8,6 +8,13 @@
       "when": 1765888303050,
       "tag": "0000_familiar_thunderbolt",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765891011880,
+      "tag": "0001_lovely_pete_wisdom",
+      "breakpoints": true
     }
   ]
 }
