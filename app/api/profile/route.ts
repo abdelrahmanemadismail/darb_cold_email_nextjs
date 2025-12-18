@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Database from 'better-sqlite3';
+import { sql } from '@/db';
 import { requireAuth, isErrorResponse } from '@/lib/api-auth';
-
-const dbPath = process.env.NODE_ENV === 'production' ? './db.sqlite' : './db.sqlite';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,17 +12,16 @@ export async function GET(request: NextRequest) {
     const { user } = authResult;
 
     // Get user profile from database
-    const db = new Database(dbPath);
-    const stmt = db.prepare('SELECT id, name, email, role, image, createdAt, updatedAt FROM user WHERE id = ?');
-    const profile = stmt.get(user.id);
-    db.close();
+    const profiles = await sql`SELECT id, name, email, role, image, "createdAt", "updatedAt" FROM "user" WHERE id = ${user.id}`;
 
-    if (!profile) {
+    if (profiles.length === 0) {
       return NextResponse.json(
         { error: 'Profile not found' },
         { status: 404 }
       );
     }
+
+    const profile = profiles[0];
 
     return NextResponse.json({ profile });
   } catch (error) {
@@ -63,11 +60,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Check if email is already in use by another user
-    const db = new Database(dbPath);
-    const existingUser = db.prepare('SELECT id FROM user WHERE email = ? AND id != ?').get(email, user.id);
+    const existingUsers = await sql`SELECT id FROM "user" WHERE email = ${email} AND id != ${user.id}`;
 
-    if (existingUser) {
-      db.close();
+    if (existingUsers.length > 0) {
       return NextResponse.json(
         { error: 'Email is already in use' },
         { status: 400 }
@@ -75,11 +70,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Update user profile in database
-    const stmt = db.prepare('UPDATE user SET name = ?, email = ?, updatedAt = ? WHERE id = ?');
-    const result = stmt.run(name.trim(), email.trim(), Date.now(), user.id);
+    const updateResult = await sql`UPDATE "user" SET name = ${name.trim()}, email = ${email.trim()}, "updatedAt" = ${new Date()} WHERE id = ${user.id}`;
 
-    if (result.changes === 0) {
-      db.close();
+    if (updateResult.count === 0) {
       return NextResponse.json(
         { error: 'Profile not found' },
         { status: 404 }
@@ -87,9 +80,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Get updated profile
-    const updatedStmt = db.prepare('SELECT id, name, email, role, image, createdAt, updatedAt FROM user WHERE id = ?');
-    const updatedProfile = updatedStmt.get(user.id);
-    db.close();
+    const updatedProfiles = await sql`SELECT id, name, email, role, image, "createdAt", "updatedAt" FROM "user" WHERE id = ${user.id}`;
+    const updatedProfile = updatedProfiles[0];
 
     return NextResponse.json({
       message: 'Profile updated successfully',

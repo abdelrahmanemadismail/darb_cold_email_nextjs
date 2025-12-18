@@ -9,7 +9,7 @@ This platform is designed for B2B marketing teams to streamline their data colle
 ## ✨ Key Features
 
 ### 🔐 Authentication & Authorization
-- **Better-Auth** integration with SQLite database
+- **Better-Auth** integration with PostgreSQL database
 - **Role-Based Access Control (RBAC)** with three roles:
   - **Admin**: Full system access, user management, all permissions
   - **Editor**: Content and campaign management, script execution
@@ -69,7 +69,8 @@ This platform is designed for B2B marketing teams to streamline their data colle
 
 ### Backend & Database
 - **Authentication**: Better-Auth
-- **Database**: SQLite (better-sqlite3)
+- **Database**: PostgreSQL with Drizzle ORM
+- **ORM**: Drizzle ORM
 - **API Client**: Axios with interceptors
 - **Password Hashing**: bcrypt
 
@@ -84,6 +85,7 @@ This platform is designed for B2B marketing teams to streamline their data colle
 ### Prerequisites
 - Node.js 20+
 - npm or yarn
+- PostgreSQL 14+ (running locally or remotely)
 
 ### Setup Steps
 
@@ -98,17 +100,24 @@ This platform is designed for B2B marketing teams to streamline their data colle
    npm install
    ```
 
-3. **Set up environment variables**
+3. **Set up PostgreSQL**
+   Create a PostgreSQL database:
+   ```sql
+   CREATE DATABASE darb_cold_email;
+   ```
+
+4. **Set up environment variables**
    Create a `.env.local` file in the root directory:
    ```env
    # App
    NEXT_PUBLIC_APP_URL=http://localhost:3000
+   NEXT_PUBLIC_API_URL=http://localhost:3000/api
 
-   # Database
-   DATABASE_URL=./db.sqlite
+   # Database (PostgreSQL)
+   DATABASE_URL=postgresql://username:password@localhost:5432/darb_cold_email
 
    # Better Auth
-   BETTER_AUTH_SECRET=your-secret-key-here
+   BETTER_AUTH_SECRET=your-secret-key-here-change-in-production
    BETTER_AUTH_URL=http://localhost:3000
 
    # API Keys (optional)
@@ -116,8 +125,16 @@ This platform is designed for B2B marketing teams to streamline their data colle
    APOLLO_API_KEY=your-apollo-key
    ```
 
-4. **Initialize the database**
-   The database schema is automatically created on first run. To create an admin user:
+5. **Run database migrations**
+   ```bash
+   # Run Better Auth migrations
+   npm run migrate-auth
+
+   # Run Drizzle migrations for companies/contacts
+   npm run db:push
+   ```
+
+6. **Create an admin user**
    ```bash
    npm run create-admin
    ```

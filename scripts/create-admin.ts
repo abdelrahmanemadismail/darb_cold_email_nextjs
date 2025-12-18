@@ -3,8 +3,12 @@
  * Run with: npm run create-admin
  */
 
+// Load environment variables FIRST before any imports that use them
+import { config } from "dotenv";
+config({ path: '.env.local' });
+
 import { auth } from "../lib/auth";
-import Database from "better-sqlite3";
+import { sql } from "../db";
 import * as readline from "readline";
 
 const rl = readline.createInterface({
@@ -52,15 +56,12 @@ async function createAdminUser() {
     rl.close();
 
     // Check if user already exists
-    const db = new Database('./db.sqlite');
-    const existingUser = db.prepare('SELECT id FROM user WHERE email = ?').get(email.trim().toLowerCase());
+    const existingUsers = await sql`SELECT id FROM "user" WHERE email = ${email.trim().toLowerCase()}`;
 
-    if (existingUser) {
+    if (existingUsers.length > 0) {
       console.log('❌ A user with this email already exists');
-      db.close();
       process.exit(1);
     }
-    db.close();
 
     console.log('\n⏳ Creating admin user...\n');
 
@@ -78,10 +79,7 @@ async function createAdminUser() {
     }
 
     // Update user role to admin
-    const dbUpdate = new Database('./db.sqlite');
-    const updateStmt = dbUpdate.prepare('UPDATE user SET role = ? WHERE id = ?');
-    updateStmt.run('admin', result.user.id);
-    dbUpdate.close();
+    await sql`UPDATE "user" SET role = ${'admin'} WHERE id = ${result.user.id}`;
 
     console.log(`✅ Successfully created admin user!\n`);
     console.log(`User Details:`);

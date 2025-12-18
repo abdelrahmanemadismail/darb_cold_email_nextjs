@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import Database from 'better-sqlite3';
+import { sql } from '@/db';
 import { isValidRole } from '@/lib/roles';
 import { requirePermission, isErrorResponse } from '@/lib/api-auth';
-
-const dbPath = process.env.NODE_ENV === 'production' ? './db.sqlite' : './db.sqlite';
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,10 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get all users from database
-    const db = new Database(dbPath);
-    const stmt = db.prepare('SELECT id, name, email, role, createdAt FROM user ORDER BY createdAt DESC');
-    const users = stmt.all();
-    db.close();
+    const users = await sql`SELECT id, name, email, role, "createdAt" FROM "user" ORDER BY "createdAt" DESC`;
 
     return NextResponse.json({ users });
   } catch (error) {
@@ -70,19 +65,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const db = new Database(dbPath);
-
     // Check if email already exists
-    const existingUser = db.prepare('SELECT id FROM user WHERE email = ?').get(email.trim().toLowerCase());
-    if (existingUser) {
-      db.close();
+    const existingUsers = await sql`SELECT id FROM "user" WHERE email = ${email.trim().toLowerCase()}`;
+
+    if (existingUsers.length > 0) {
       return NextResponse.json(
         { error: 'A user with this email already exists' },
         { status: 409 }
       );
     }
-
-    db.close();
 
     // Use better-auth's API to create the user with proper password hashing
     const createResult = await auth.api.signUpEmail({
@@ -102,17 +93,14 @@ export async function POST(request: NextRequest) {
 
     // Update user role if provided
     const userRole = role || 'viewer';
-    const dbUpdate = new Database(dbPath);
-    const updateStmt = dbUpdate.prepare('UPDATE user SET role = ? WHERE id = ?');
-    updateStmt.run(userRole, createResult.user.id);
+    await sql`UPDATE "user" SET role = ${userRole} WHERE id = ${createResult.user.id}`;
 
     // Get the updated user
-    const createdUser = dbUpdate.prepare('SELECT id, name, email, role, createdAt FROM user WHERE id = ?').get(createResult.user.id);
-    dbUpdate.close();
+    const createdUser = await sql`SELECT id, name, email, role, "createdAt" FROM "user" WHERE id = ${createResult.user.id}`;
 
     return NextResponse.json({
       message: 'User created successfully',
-      user: createdUser,
+      user: createdUser[0],
     }, { status: 201 });
   } catch (error) {
     console.error('Error creating user:', error);

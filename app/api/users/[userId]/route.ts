@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Database from 'better-sqlite3';
+import { sql } from '@/db';
 import { isValidRole } from '@/lib/roles';
 import { requirePermission, isErrorResponse } from '@/lib/api-auth';
-
-const dbPath = process.env.NODE_ENV === 'production' ? './db.sqlite' : './db.sqlite';
 
 export async function PATCH(
   request: NextRequest,
@@ -39,11 +37,9 @@ export async function PATCH(
     }
 
     // Update user role in database
-    const db = new Database(dbPath);
-    const stmt = db.prepare('UPDATE user SET role = ?, updatedAt = ? WHERE id = ?');
-    const result = stmt.run(role, Date.now(), userId);
+    const updateResult = await sql`UPDATE "user" SET role = ${role}, "updatedAt" = ${new Date()} WHERE id = ${userId}`;
 
-    if (result.changes === 0) {
+    if (updateResult.count === 0) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
@@ -51,10 +47,8 @@ export async function PATCH(
     }
 
     // Get updated user
-    const userStmt = db.prepare('SELECT id, name, email, role FROM user WHERE id = ?');
-    const updatedUser = userStmt.get(userId);
-
-    db.close();
+    const users = await sql`SELECT id, name, email, role FROM "user" WHERE id = ${userId}`;
+    const updatedUser = users[0];
 
     return NextResponse.json({
       message: 'User role updated successfully',
@@ -84,17 +78,16 @@ export async function GET(
     }
 
     // Get user from database
-    const db = new Database(dbPath);
-    const stmt = db.prepare('SELECT id, name, email, role, createdAt FROM user WHERE id = ?');
-    const user = stmt.get(userId);
-    db.close();
+    const users = await sql`SELECT id, name, email, role, "createdAt" FROM "user" WHERE id = ${userId}`;
 
-    if (!user) {
+    if (users.length === 0) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
+
+    const user = users[0];
 
     return NextResponse.json({ user });
   } catch (error) {
@@ -130,12 +123,9 @@ export async function DELETE(
     }
 
     // Delete user from database (cascade will delete related records)
-    const db = new Database(dbPath);
-    const stmt = db.prepare('DELETE FROM user WHERE id = ?');
-    const result = stmt.run(userId);
-    db.close();
+    const deleteResult = await sql`DELETE FROM "user" WHERE id = ${userId}`;
 
-    if (result.changes === 0) {
+    if (deleteResult.count === 0) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
