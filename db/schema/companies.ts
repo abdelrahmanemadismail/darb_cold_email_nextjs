@@ -10,7 +10,6 @@ export const companies = pgTable('companies', {
 
   // Tracking
   source: varchar('source', { length: 100 }), // e.g., "manual", "apify", "Apollo"
-  tags: varchar('tags', { length: 255 }).array(),
 
   // Audit fields
   createdAt: timestamp('created_at').defaultNow().notNull(),
