@@ -15,6 +15,13 @@
       "when": 1765891011880,
       "tag": "0001_lovely_pete_wisdom",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766691557309,
+      "tag": "0002_tough_whistler",
+      "breakpoints": true
     }
   ]
 }

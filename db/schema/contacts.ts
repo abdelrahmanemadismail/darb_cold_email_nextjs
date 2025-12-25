@@ -1,5 +1,6 @@
 import { pgTable, uuid, varchar, text, timestamp, boolean } from 'drizzle-orm/pg-core';
 import { companies } from './companies';
+import { user } from './auth';
 
 export const contacts = pgTable('contacts', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -12,21 +13,16 @@ export const contacts = pgTable('contacts', {
   gender: varchar('gender', { length: 50 }),
 
   // Professional information
-  jobTitle: varchar('job_title', { length: 255 }),
-  department: varchar('department', { length: 100 }),
-  // seniority: varchar('seniority', { length: 50 }), // e.g., "entry", "mid", "senior", "executive"
+  position: varchar('position', { length: 255 }),
 
   // Company relationship
   companyId: uuid('company_id').references(() => companies.id, { onDelete: 'set null' }),
 
   // Social profiles
   linkedinUrl: varchar('linkedin_url', { length: 500 }),
-  twitterUrl: varchar('twitter_url', { length: 500 }),
 
   // Contact status
-  isVerified: boolean('is_verified').default(false),
-  status: varchar('status', { length: 50 }).default('active'), // active, unsubscribed, bounced, etc.
-
+  isEmailVerified: boolean('is_email_verified').default(false),
 
   // Tracking
   tags: varchar('tags', { length: 100 }).array(),
@@ -39,6 +35,8 @@ export const contacts = pgTable('contacts', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
   createdBy: varchar('created_by', { length: 255 }),
   lastContactedAt: timestamp('last_contacted_at'),
+
+  managedBy: text('managed_by').references(() => user.id, { onDelete: 'set null' }),
 });
 
 export type Contact = typeof contacts.$inferSelect;

@@ -1,0 +1,13 @@
+First Name,Last name,Company,Position,Email,Mobile,Linkedin,Email Stutse,Company size,Company keyord,Country,City,Gender,Tags
+John,Smith,Acme Corporation,Software Engineer,john.smith@acme.com,+1-555-0101,https://linkedin.com/in/johnsmith,Verified,500-1000,"SaaS,B2B,Software",USA,San Francisco,Male,"Developer,Lead"
+Sarah,Johnson,TechStart Inc,Product Manager,sarah.j@techstart.io,+1-555-0102,https://linkedin.com/in/sarahj,Verified,50-200,"Startup,Cloud,AI",USA,Austin,Female,"Product,Manager"
+Mike,Davis,GlobalSoft,CTO,mike.davis@globalsoft.com,+1-555-0103,,Not Verified,1000+,"Enterprise,Security,Fintech",UK,London,Male,"Executive,Tech"
+Emma,Wilson,Acme Corporation,Marketing Director,emma.w@acme.com,+44-20-7123-4567,https://linkedin.com/in/emmawilson,Verified,500-1000,"SaaS,B2B,Software",USA,San Francisco,Female,"Marketing,Director"
+Carlos,Rodriguez,InnovateLab,Data Scientist,carlos.r@innovatelab.ai,+34-91-123-4567,https://linkedin.com/in/carlosr,Not Verified,10-50,"AI,Analytics,Research",Spain,Madrid,Male,"Data,AI,Research"
+Lisa,Chen,CloudScale,Senior Developer,lisa.chen@cloudscale.tech,+86-10-1234-5678,https://linkedin.com/in/lisachen,Verified,200-500,"Cloud,DevOps,SaaS",China,Beijing,Female,"Developer,Cloud"
+Ahmed,Hassan,TechStart Inc,Sales Manager,ahmed.h@techstart.io,+20-2-1234-5678,,Verified,50-200,"Startup,Cloud,AI",Egypt,Cairo,Male,"Sales,B2B"
+Nina,Patel,DataFlow Systems,Business Analyst,nina.patel@dataflow.com,+91-22-1234-5678,https://linkedin.com/in/ninapatel,Not Verified,100-500,"Analytics,BigData,Enterprise",India,Mumbai,Female,"Analyst,Business"
+Tom,Brown,Acme Corporation,DevOps Engineer,tom.brown@acme.com,+1-555-0104,https://linkedin.com/in/tombrown,Verified,500-1000,"SaaS,B2B,Software",USA,New York,Male,"DevOps,Engineer"
+Sofia,Martinez,DesignHub,UX Designer,sofia.m@designhub.co,+52-55-1234-5678,https://linkedin.com/in/sofiam,Verified,20-50,"Design,Creative,Agency",Mexico,Mexico City,Female,"Design,UX"
+James,Taylor,GlobalSoft,Security Analyst,james.t@globalsoft.com,+1-555-0105,,Not Verified,1000+,"Enterprise,Security,Fintech",USA,Boston,Male,"Security,Analyst"
+Yuki,Tanaka,CloudScale,Product Owner,yuki.t@cloudscale.tech,+81-3-1234-5678,https://linkedin.com/in/yukitanaka,Verified,200-500,"Cloud,DevOps,SaaS",Japan,Tokyo,Female,"Product,Agile"
