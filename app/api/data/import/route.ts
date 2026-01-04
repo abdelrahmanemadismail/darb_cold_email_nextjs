@@ -123,14 +123,14 @@ export async function POST(request: NextRequest) {
 
         // Check if contact already exists
         const email = row['Email'].trim();
-        
+
         // Validate email
         if (!email || !isValidEmail(email)) {
           results.errors.push(`Invalid or missing email for ${row['First Name']} ${row['Last name']}`);
           results.failed++;
           continue;
         }
-        
+
         const [existingContact] = await db
           .select()
           .from(contacts)
@@ -198,8 +198,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error importing data:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to import data', 
+      {
+        error: 'Failed to import data',
         details: error instanceof Error ? error.message : 'Unknown error',
         stack: error instanceof Error ? error.stack : undefined
       },

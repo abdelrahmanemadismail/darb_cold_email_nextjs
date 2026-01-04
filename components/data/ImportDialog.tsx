@@ -98,31 +98,31 @@ export function ImportDialog({ open, onOpenChange, onImportComplete }: ImportDia
   // Map various CSV column formats to expected format
   const mapColumnNames = (row: CSVRow): CSVRow => {
     const mapped: CSVRow = {};
-    
+
     // Name mappings
     mapped['First Name'] = row['First Name'] || row['first_name'] || row['firstName'] || '';
     mapped['Last name'] = row['Last name'] || row['last_name'] || row['lastName'] || '';
-    
+
     // Contact info
     mapped['Email'] = row['Email'] || row['email'] || '';
     mapped['Mobile'] = row['Mobile'] || row['mobile'] || row['phone'] || '';
     mapped['Position'] = row['Position'] || row['position'] || row['title'] || '';
     mapped['Linkedin'] = row['Linkedin'] || row['linkedinUrl'] || row['linkedin_url'] || '';
-    
+
     // Company info
     mapped['Company'] = row['Company'] || row['organizationName'] || row['company'] || row['organization'] || '';
     mapped['Company size'] = row['Company size'] || row['organizationSize'] || row['company_size'] || '';
     mapped['Company keyord'] = row['Company keyord'] || row['organizationSpecialities'] || row['keywords'] || row['specialities'] || '';
-    
+
     // Location - prefer organization location over person location
     mapped['City'] = row['City'] || row['organizationCity'] || row['city'] || '';
     mapped['Country'] = row['Country'] || row['organizationCountry'] || row['country'] || '';
-    
+
     // Other fields
     mapped['Gender'] = row['Gender'] || row['gender'] || '';
     mapped['Tags'] = row['Tags'] || row['tags'] || row['seniority'] || '';
     mapped['Email Stutse'] = row['Email Stutse'] || row['emailStatus'] || row['email_status'] || '';
-    
+
     return mapped;
   };
 
