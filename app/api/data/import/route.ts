@@ -25,6 +25,20 @@ interface ImportRow {
   'Tags': string;
 }
 
+// Helper to safely truncate strings to max length
+const truncate = (str: string | null | undefined, maxLength: number): string | null => {
+  if (!str) return null;
+  const trimmed = str.trim();
+  if (!trimmed) return null;
+  return trimmed.length > maxLength ? trimmed.substring(0, maxLength) : trimmed;
+};
+
+// Validate email format
+const isValidEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 export async function POST(request: NextRequest) {
   try {
     const session = await auth.api.getSession({
@@ -46,6 +60,9 @@ export async function POST(request: NextRequest) {
     if (!rows || rows.length === 0) {
       return NextResponse.json({ error: 'No data provided' }, { status: 400 });
     }
+
+    console.log('Import request received with', rows.length, 'rows');
+    console.log('First row sample:', JSON.stringify(rows[0]));
 
     const results = {
       success: 0,
@@ -81,16 +98,16 @@ export async function POST(request: NextRequest) {
           } else {
             // Create new company
             const keywords = row['Company keyord']
-              ? row['Company keyord'].split(',').map(k => k.trim()).filter(Boolean)
+              ? row['Company keyord'].split(',').map(k => k.trim()).filter(Boolean).map(k => k.substring(0, 255))
               : [];
 
             const [newCompany] = await db
               .insert(companies)
               .values({
-                name: companyName,
-                size: row['Company size'] || null,
-                city: row['City'] || null,
-                country: row['Country'] || null,
+                name: truncate(companyName, 255) || 'Unknown Company',
+                size: truncate(row['Company size'], 50),
+                city: truncate(row['City'], 100),
+                country: truncate(row['Country'], 100),
                 keywords,
                 source: 'import',
                 createdBy: session.user.email,
@@ -106,6 +123,14 @@ export async function POST(request: NextRequest) {
 
         // Check if contact already exists
         const email = row['Email'].trim();
+        
+        // Validate email
+        if (!email || !isValidEmail(email)) {
+          results.errors.push(`Invalid or missing email for ${row['First Name']} ${row['Last name']}`);
+          results.failed++;
+          continue;
+        }
+        
         const [existingContact] = await db
           .select()
           .from(contacts)
@@ -135,22 +160,25 @@ export async function POST(request: NextRequest) {
           gender = genderMap[row['Gender'].toLowerCase()] || null;
         }
 
-        await db.insert(contacts).values({
-          firstName: row['First Name']?.trim() || '',
-          lastName: row['Last name']?.trim() || '',
+        // Prepare contact data with truncated values
+        const contactData = {
+          firstName: truncate(row['First Name'], 100) || 'Unknown',
+          lastName: truncate(row['Last name'], 100) || 'Unknown',
           email,
-          phone: row['Mobile'] || null,
+          phone: truncate(row['Mobile'], 50),
           gender,
-          position: row['Position'] || null,
+          position: truncate(row['Position'], 255),
           companyId,
-          linkedinUrl: row['Linkedin'] || null,
+          linkedinUrl: truncate(row['Linkedin'], 500),
           isEmailVerified,
           tags,
           notes: null,
           createdBy: session.user.email,
           createdAt: new Date(),
           updatedAt: new Date(),
-        });
+        };
+
+        await db.insert(contacts).values(contactData);
 
         results.contactsCreated++;
         results.success++;
@@ -170,7 +198,11 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error importing data:', error);
     return NextResponse.json(
-      { error: 'Failed to import data' },
+      { 
+        error: 'Failed to import data', 
+        details: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined
+      },
       { status: 500 }
     );
   }

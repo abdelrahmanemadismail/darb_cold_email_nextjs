@@ -45,7 +45,7 @@ export function ImportDialog({ open, onOpenChange, onImportComplete }: ImportDia
     reader.onload = (e) => {
       const text = e.target?.result as string;
       const lines = text.split('\n').filter(line => line.trim());
-      const headers = lines[0].split(',').map(h => h.trim());
+      const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/^"|"$/g, ''));
 
       const previewData = lines.slice(1, 4).map(line => {
         const values = parseCSVLine(line);
@@ -92,7 +92,38 @@ export function ImportDialog({ open, onOpenChange, onImportComplete }: ImportDia
         obj[header] = values[index]?.trim() || '';
       });
       return obj;
-    }).filter(obj => obj['Email'] && obj['Email'].trim()); // Filter out empty rows
+    }).filter(obj => obj['Email'] || obj['email']); // Filter out empty rows
+  };
+
+  // Map various CSV column formats to expected format
+  const mapColumnNames = (row: CSVRow): CSVRow => {
+    const mapped: CSVRow = {};
+    
+    // Name mappings
+    mapped['First Name'] = row['First Name'] || row['first_name'] || row['firstName'] || '';
+    mapped['Last name'] = row['Last name'] || row['last_name'] || row['lastName'] || '';
+    
+    // Contact info
+    mapped['Email'] = row['Email'] || row['email'] || '';
+    mapped['Mobile'] = row['Mobile'] || row['mobile'] || row['phone'] || '';
+    mapped['Position'] = row['Position'] || row['position'] || row['title'] || '';
+    mapped['Linkedin'] = row['Linkedin'] || row['linkedinUrl'] || row['linkedin_url'] || '';
+    
+    // Company info
+    mapped['Company'] = row['Company'] || row['organizationName'] || row['company'] || row['organization'] || '';
+    mapped['Company size'] = row['Company size'] || row['organizationSize'] || row['company_size'] || '';
+    mapped['Company keyord'] = row['Company keyord'] || row['organizationSpecialities'] || row['keywords'] || row['specialities'] || '';
+    
+    // Location - prefer organization location over person location
+    mapped['City'] = row['City'] || row['organizationCity'] || row['city'] || '';
+    mapped['Country'] = row['Country'] || row['organizationCountry'] || row['country'] || '';
+    
+    // Other fields
+    mapped['Gender'] = row['Gender'] || row['gender'] || '';
+    mapped['Tags'] = row['Tags'] || row['tags'] || row['seniority'] || '';
+    mapped['Email Stutse'] = row['Email Stutse'] || row['emailStatus'] || row['email_status'] || '';
+    
+    return mapped;
   };
 
   const handleImport = async () => {
@@ -108,7 +139,15 @@ export function ImportDialog({ open, onOpenChange, onImportComplete }: ImportDia
           const text = e.target?.result as string;
           const data = parseCSV(text);
 
-          const response = await axios.post('/api/data/import', { data });
+          console.log('Parsed CSV data:', data.length, 'rows');
+          console.log('First row keys:', Object.keys(data[0] || {}));
+          console.log('Sample row:', data[0]);
+
+          // Map column names to expected format
+          const mappedData = data.map(mapColumnNames);
+          console.log('Mapped data sample:', mappedData[0]);
+
+          const response = await axios.post('/api/data/import', { data: mappedData });
 
           setResults(response.data.results);
 
@@ -124,7 +163,13 @@ export function ImportDialog({ open, onOpenChange, onImportComplete }: ImportDia
           }
         } catch (error) {
           console.error('Import error:', error);
-          toast.error('Failed to import data');
+          if (axios.isAxiosError(error)) {
+            const errorMessage = error.response?.data?.error || 'Failed to import data';
+            const errorDetails = error.response?.data?.details;
+            toast.error(errorDetails ? `${errorMessage}: ${errorDetails}` : errorMessage);
+          } else {
+            toast.error('Failed to import data');
+          }
         } finally {
           setImporting(false);
         }
@@ -202,6 +247,9 @@ John,Smith,Acme Corporation,Software Engineer,john.smith@acme.com,+1-555-0101,ht
           {preview.length > 0 && !results && (
             <div className="space-y-2">
               <p className="text-sm font-medium">Preview (first 3 rows)</p>
+              <div className="text-xs text-muted-foreground mb-2">
+                Detected columns: {Object.keys(preview[0] || {}).join(', ')}
+              </div>
               <div className="border rounded-lg overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-muted">
