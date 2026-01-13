@@ -391,10 +391,10 @@ export default function DataPage() {
     try {
       const response = await fetch(`/api/${type}?limit=10000`);
       if (!response.ok) throw new Error('Failed to fetch data');
-      
+
       const result = await response.json();
       const data = result.data as Record<string, unknown>[];
-      
+
       if (data.length === 0) {
         toast.error('No data to export');
         return;
@@ -402,11 +402,11 @@ export default function DataPage() {
 
       // Define columns based on the CSV format provided
       const columns = [
-        'city', 'country', 'email', 'first_name', 'last_name', 'functional', 
-        'lastName', 'linkedinUrl', 'organizationCity', 'organizationCountry', 
-        'organizationDescription', 'organizationFoundedYear', 'organizationId', 
-        'organizationIndustry', 'organizationLinkedinUrl', 'organizationName', 
-        'organizationSize', 'organizationSpecialities', 'organizationState', 
+        'city', 'country', 'email', 'first_name', 'last_name', 'functional',
+        'lastName', 'linkedinUrl', 'organizationCity', 'organizationCountry',
+        'organizationDescription', 'organizationFoundedYear', 'organizationId',
+        'organizationIndustry', 'organizationLinkedinUrl', 'organizationName',
+        'organizationSize', 'organizationSpecialities', 'organizationState',
         'organizationWebsite', 'personId', 'position', 'seniority', 'source', 'state'
       ];
 
@@ -414,57 +414,57 @@ export default function DataPage() {
       const csvRows = [columns.join(',')];
 
       // Process each row
-      data.forEach((row: any) => {
+      data.forEach((row: Record<string, unknown>) => {
         const values = columns.map(column => {
-          let value = '';
-          
+          let value: string | number = '';
+
           // Map data fields to CSV columns based on actual schema
           switch (column) {
             case 'city':
-              value = row.company?.city || '';
+              value = (row.company as Record<string, unknown>)?.city as string || '';
               break;
             case 'country':
-              value = row.company?.country || '';
+              value = (row.company as Record<string, unknown>)?.country as string || '';
               break;
             case 'email':
-              value = row.email || '';
+              value = (row.email as string) || '';
               break;
             case 'first_name':
-              value = row.firstName || '';
+              value = (row.firstName as string) || '';
               break;
             case 'last_name':
             case 'lastName':
-              value = row.lastName || '';
+              value = (row.lastName as string) || '';
               break;
             case 'functional':
               value = ''; // Not available in schema
               break;
             case 'linkedinUrl':
-              value = row.linkedinUrl || '';
+              value = row.linkedinUrl as string || '';
               break;
             case 'organization':
-              value = row.company?.name || '';
+              value = (row.company as Record<string, unknown>)?.name as string || '';
               break;
             case 'personId':
-              value = row.id || '';
+              value = row.id as string || '';
               break;
             case 'position':
-              value = row.position || '';
+              value = row.position as string || '';
               break;
             case 'seniority':
               value = ''; // Not available in schema
               break;
             case 'source':
-              value = row.company?.source || '';
+              value = (row.company as Record<string, unknown>)?.source as string || '';
               break;
             case 'state':
               value = ''; // Not available in schema
               break;
             case 'organizationCity':
-              value = row.company?.city || '';
+              value = (row.company as Record<string, unknown>)?.city as string || '';
               break;
             case 'organizationCountry':
-              value = row.company?.country || '';
+              value = (row.company as Record<string, unknown>)?.country as string || '';
               break;
             case 'organizationDescription':
               value = ''; // Not available in schema
@@ -473,7 +473,7 @@ export default function DataPage() {
               value = ''; // Not available in schema
               break;
             case 'organizationId':
-              value = row.company?.id || '';
+              value = (row.company as Record<string, unknown>)?.id as string || '';
               break;
             case 'organizationIndustry':
               value = ''; // Not available in schema
@@ -482,13 +482,15 @@ export default function DataPage() {
               value = ''; // Not available in schema
               break;
             case 'organizationName':
-              value = row.company?.name || '';
+              value = (row.company as Record<string, unknown>)?.name as string || '';
               break;
             case 'organizationSize':
-              value = row.company?.size || '';
+              value = (row.company as Record<string, unknown>)?.size as string || '';
               break;
             case 'organizationSpecialities':
-              value = Array.isArray(row.company?.keywords) ? row.company.keywords.join('; ') : '';
+              value = Array.isArray((row.company as Record<string, unknown>)?.keywords)
+                ? ((row.company as Record<string, unknown>).keywords as string[]).join('; ')
+                : '';
               break;
             case 'organizationState':
               value = ''; // Not available in schema
@@ -497,17 +499,17 @@ export default function DataPage() {
               value = ''; // Not available in schema
               break;
             default:
-              value = row[column] || '';
+              value = (row[column] as string) || '';
           }
-          
+
           // Handle values with commas or quotes
           if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
             value = `"${value.replace(/"/g, '""')}"`;
           }
-          
+
           return value;
         });
-        
+
         csvRows.push(values.join(','));
       });
 

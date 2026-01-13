@@ -17,7 +17,14 @@ interface ScriptExecution {
   currentPage: number;
   totalPages: number;
   progressStatus: string;
-  parameters: Record<string, unknown>;
+  parameters: {
+    maxPages?: number;
+    perPage?: number;
+    personTitles?: string[];
+    personLocations?: string[];
+    companyLocations?: string[];
+    [key: string]: unknown;
+  };
   results: {
     totalCompanies?: number;
     totalContacts?: number;
@@ -97,10 +104,10 @@ export function RunningScriptsList({ }: RunningScriptsListProps) {
                         'secondary'
                       }
                     >
-                      {script.status === 'running' && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
-                      {script.status === 'completed' && '✓ '}
-                      {script.status === 'failed' && '✗ '}
-                      {script.status === 'cancelled' && '⊗ '}
+                      {script.status === 'running' ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+                      {script.status === 'completed' ? '✓ ' : null}
+                      {script.status === 'failed' ? '✗ ' : null}
+                      {script.status === 'cancelled' ? '⊗ ' : null}
                       {script.status.charAt(0).toUpperCase() + script.status.slice(1)}
                     </Badge>
                   </div>
@@ -109,12 +116,12 @@ export function RunningScriptsList({ }: RunningScriptsListProps) {
                       <Clock className="h-3 w-3" />
                       Started {format(new Date(script.startedAt), 'HH:mm:ss')}
                     </span>
-                    {script.parameters?.maxPages !== undefined && (
+                    {script.parameters?.maxPages !== undefined ? (
                       <span>Max Pages: {String(script.parameters.maxPages)}</span>
-                    )}
-                    {script.parameters?.perPage !== undefined && (
+                    ) : null}
+                    {script.parameters?.perPage !== undefined ? (
                       <span>Per Page: {String(script.parameters.perPage)}</span>
-                    )}
+                    ) : null}
                   </div>
                 </div>
                 {script.status !== 'running' && (
@@ -131,19 +138,19 @@ export function RunningScriptsList({ }: RunningScriptsListProps) {
               {/* Search Criteria */}
               {(script.parameters?.personTitles || script.parameters?.personLocations || script.parameters?.companyLocations) && (
                 <div className="flex flex-wrap gap-2 text-xs">
-                  {Array.isArray(script.parameters.personTitles) && script.parameters.personTitles.map((title: unknown, idx: number) => (
-                    <Badge key={`title-${idx}-${String(title)}`} variant="outline" className="font-normal">
-                      Title: {String(title) as string}
+                  {Array.isArray(script.parameters.personTitles) && (script.parameters.personTitles as string[]).map((title, idx) => (
+                    <Badge key={`title-${idx}-${title}`} variant="outline" className="font-normal">
+                      Title: {title}
                     </Badge>
                   ))}
-                  {Array.isArray(script.parameters.personLocations) && script.parameters.personLocations.map((loc: unknown, idx: number) => (
-                    <Badge key={`person-${idx}-${String(loc)}`} variant="outline" className="font-normal">
-                      Person: {String(loc) as string}
+                  {Array.isArray(script.parameters.personLocations) && (script.parameters.personLocations as string[]).map((loc, idx) => (
+                    <Badge key={`person-${idx}-${loc}`} variant="outline" className="font-normal">
+                      Person: {loc}
                     </Badge>
                   ))}
-                  {Array.isArray(script.parameters.companyLocations) && script.parameters.companyLocations.map((loc: unknown, idx: number) => (
-                    <Badge key={`company-${idx}-${String(loc)}`} variant="outline" className="font-normal">
-                      Company: {String(loc) as string}
+                  {Array.isArray(script.parameters.companyLocations) && (script.parameters.companyLocations as string[]).map((loc, idx) => (
+                    <Badge key={`company-${idx}-${loc}`} variant="outline" className="font-normal">
+                      Company: {loc}
                     </Badge>
                   ))}
                 </div>

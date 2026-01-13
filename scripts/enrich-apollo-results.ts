@@ -14,7 +14,7 @@ import { contacts as contactsTable } from '@/db/schema/contacts';
 import { apolloSearchResults } from '@/db/schema/apollo-search-results';
 import { eq } from 'drizzle-orm';
 import { ApolloRateLimiter } from '@/lib/apollo/rate-limiter';
-import { ApolloApiError, ApolloDatabaseError } from '@/lib/apollo/errors';
+import { ApolloApiError } from '@/lib/apollo/errors';
 import { ApolloLogger } from '@/lib/apollo/logger';
 
 interface EnrichmentDetails {
@@ -129,7 +129,7 @@ export class ApolloEnrichmentService {
       }
 
       const data = JSON.parse(responseText);
-      
+
       ApolloLogger.info('Apollo bulk enrichment successful', {
         operation: 'enrichPeople',
         batchSize: details.length,
@@ -145,7 +145,7 @@ export class ApolloEnrichmentService {
         });
         throw error;
       }
-      
+
       ApolloLogger.error('Unexpected error during Apollo bulk enrichment', error, {
         operation: 'enrichPeople',
         batchSize: details.length,
@@ -441,6 +441,7 @@ export class ApolloEnrichmentService {
         }
 
       } catch (error) {
+        const batchNumber = Math.floor(i / this.batchSize) + 1;
         ApolloLogger.error(`Error enriching batch ${batchNumber}`, error, {
           operation: 'processUnprocessedResults',
           userId,

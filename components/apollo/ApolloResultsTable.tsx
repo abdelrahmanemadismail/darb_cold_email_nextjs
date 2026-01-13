@@ -115,7 +115,7 @@ export function ApolloResultsTable() {
 
       return response.json();
     },
-    onSuccess: (result) => {
+    onSuccess: () => {
       toast.success(`Deleted ${selectedIds.size} results`);
       setSelectedIds(new Set());
       queryClient.invalidateQueries({ queryKey: ['apollo-results'] });
@@ -196,8 +196,8 @@ export function ApolloResultsTable() {
         r.lastNameObfuscated || '',
         r.title || '',
         r.organizationName || '',
-        (r.hasEmail === true || r.hasEmail === 'true') ? 'Yes' : 'No',
-        (r.processed === true || r.processed === 'true') ? 'Yes' : 'No',
+        r.hasEmail === true ? 'Yes' : 'No',
+        r.processed === true ? 'Yes' : 'No',
         r.createdAt ? format(new Date(r.createdAt), 'yyyy-MM-dd') : '',
       ].map(field => `"${String(field).replace(/"/g, '""')}"`).join(','))
     ].join('\n');
@@ -367,13 +367,13 @@ export function ApolloResultsTable() {
                         <div className="text-sm">{result.organizationName}</div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={result.hasEmail === true || result.hasEmail === 'true' ? 'default' : 'secondary'}>
-                          {result.hasEmail === true || result.hasEmail === 'true' ? 'Yes' : 'No'}
+                        <Badge variant={result.hasEmail === true ? 'default' : 'secondary'}>
+                          {result.hasEmail === true ? 'Yes' : 'No'}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={result.processed === true || result.processed === 'true' ? 'default' : 'outline'}>
-                          {result.processed === true || result.processed === 'true' ? 'Yes' : 'No'}
+                        <Badge variant={result.processed === true ? 'default' : 'outline'}>
+                          {result.processed === true ? 'Yes' : 'No'}
                         </Badge>
                       </TableCell>
                       <TableCell>
@@ -471,24 +471,24 @@ export function ApolloResultsTable() {
                     <div className="flex justify-between">
                       <dt className="text-muted-foreground">Has Email:</dt>
                       <dd>
-                        <Badge variant={selectedResult.hasEmail === true || selectedResult.hasEmail === 'true' ? 'default' : 'secondary'}>
-                          {selectedResult.hasEmail === true || selectedResult.hasEmail === 'true' ? 'Yes' : 'No'}
+                        <Badge variant={selectedResult.hasEmail === true ? 'default' : 'secondary'}>
+                          {selectedResult.hasEmail === true ? 'Yes' : 'No'}
                         </Badge>
                       </dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-muted-foreground">Has Phone:</dt>
                       <dd>
-                        <Badge variant={selectedResult.hasDirectPhone === true || selectedResult.hasDirectPhone === 'true' ? 'default' : 'secondary'}>
-                          {selectedResult.hasDirectPhone === true || selectedResult.hasDirectPhone === 'true' ? 'Yes' : 'No'}
+                        <Badge variant={selectedResult.hasDirectPhone === true ? 'default' : 'secondary'}>
+                          {selectedResult.hasDirectPhone === true ? 'Yes' : 'No'}
                         </Badge>
                       </dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-muted-foreground">Has Location:</dt>
                       <dd>
-                        <Badge variant={selectedResult.hasCity === true || selectedResult.hasCity === 'true' ? 'default' : 'secondary'}>
-                          {selectedResult.hasCity === true || selectedResult.hasCity === 'true' ? 'Yes' : 'No'}
+                        <Badge variant={selectedResult.hasCity === true ? 'default' : 'secondary'}>
+                          {selectedResult.hasCity === true ? 'Yes' : 'No'}
                         </Badge>
                       </dd>
                     </div>

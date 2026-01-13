@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     let body;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid JSON in request body' },
         { status: 400 }
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         },
         { status: 400 }
       );

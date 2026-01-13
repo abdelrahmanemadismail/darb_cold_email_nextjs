@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     let body;
     try {
       body = await req.json();
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid JSON in request body' },
         { status: 400 }
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error: 'Validation failed',
-          details: validationResult.error.errors,
+          details: validationResult.error.issues,
         },
         { status: 400 }
       );
