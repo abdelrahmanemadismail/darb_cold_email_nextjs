@@ -22,6 +22,20 @@
       "when": 1766691557309,
       "tag": "0002_tough_whistler",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1767949124039,
+      "tag": "0003_true_roxanne_simpson",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1736772000000,
+      "tag": "0004_convert_apollo_booleans",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,11 @@
 // Core Types for Dashboard Application
 
+// Export all type modules
+export * from './auth';
+export * from './company';
+export * from './contact';
+export * from './apollo';
+
 export type UserRole = 'admin' | 'editor' | 'viewer';
 
 export interface User {

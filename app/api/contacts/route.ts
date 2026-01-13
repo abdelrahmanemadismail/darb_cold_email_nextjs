@@ -101,6 +101,9 @@ export async function GET(request: NextRequest) {
           name: companies.name,
           city: companies.city,
           country: companies.country,
+          source: companies.source,
+          size: companies.size,
+          keywords: companies.keywords,
         },
       })
       .from(contacts)

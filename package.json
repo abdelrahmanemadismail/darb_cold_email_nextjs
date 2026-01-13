@@ -10,6 +10,8 @@
     "create-admin": "tsx scripts/create-admin.ts",
     "change-password": "tsx scripts/change-password.ts",
     "migrate-auth": "tsx scripts/migrate-better-auth.ts",
+    "apollo:enrich": "tsx scripts/enrich-apollo-results.ts",
+    "migrate-apollo-booleans": "tsx scripts/run-apollo-boolean-migration.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",

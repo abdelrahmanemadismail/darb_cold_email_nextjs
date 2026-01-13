@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Upload } from 'lucide-react';
+import { Plus, Upload, Download } from 'lucide-react';
 import { useCompanies, useCreateCompany, useUpdateCompany, useDeleteCompany } from '@/hooks/data/useCompanies';
 import { useContacts, useCreateContact, useUpdateContact, useDeleteContact, useBulkOperation } from '@/hooks/data/useContacts';
 import { CompaniesTable } from '@/components/data/CompaniesTable';
@@ -386,6 +386,149 @@ export default function DataPage() {
     }
   };
 
+  // Export all data handlers
+  const handleExportAll = async (type: 'companies' | 'contacts') => {
+    try {
+      const response = await fetch(`/api/${type}?limit=10000`);
+      if (!response.ok) throw new Error('Failed to fetch data');
+      
+      const result = await response.json();
+      const data = result.data as Record<string, unknown>[];
+      
+      if (data.length === 0) {
+        toast.error('No data to export');
+        return;
+      }
+
+      // Define columns based on the CSV format provided
+      const columns = [
+        'city', 'country', 'email', 'first_name', 'last_name', 'functional', 
+        'lastName', 'linkedinUrl', 'organizationCity', 'organizationCountry', 
+        'organizationDescription', 'organizationFoundedYear', 'organizationId', 
+        'organizationIndustry', 'organizationLinkedinUrl', 'organizationName', 
+        'organizationSize', 'organizationSpecialities', 'organizationState', 
+        'organizationWebsite', 'personId', 'position', 'seniority', 'source', 'state'
+      ];
+
+      // Create CSV header
+      const csvRows = [columns.join(',')];
+
+      // Process each row
+      data.forEach((row: any) => {
+        const values = columns.map(column => {
+          let value = '';
+          
+          // Map data fields to CSV columns based on actual schema
+          switch (column) {
+            case 'city':
+              value = row.company?.city || '';
+              break;
+            case 'country':
+              value = row.company?.country || '';
+              break;
+            case 'email':
+              value = row.email || '';
+              break;
+            case 'first_name':
+              value = row.firstName || '';
+              break;
+            case 'last_name':
+            case 'lastName':
+              value = row.lastName || '';
+              break;
+            case 'functional':
+              value = ''; // Not available in schema
+              break;
+            case 'linkedinUrl':
+              value = row.linkedinUrl || '';
+              break;
+            case 'organization':
+              value = row.company?.name || '';
+              break;
+            case 'personId':
+              value = row.id || '';
+              break;
+            case 'position':
+              value = row.position || '';
+              break;
+            case 'seniority':
+              value = ''; // Not available in schema
+              break;
+            case 'source':
+              value = row.company?.source || '';
+              break;
+            case 'state':
+              value = ''; // Not available in schema
+              break;
+            case 'organizationCity':
+              value = row.company?.city || '';
+              break;
+            case 'organizationCountry':
+              value = row.company?.country || '';
+              break;
+            case 'organizationDescription':
+              value = ''; // Not available in schema
+              break;
+            case 'organizationFoundedYear':
+              value = ''; // Not available in schema
+              break;
+            case 'organizationId':
+              value = row.company?.id || '';
+              break;
+            case 'organizationIndustry':
+              value = ''; // Not available in schema
+              break;
+            case 'organizationLinkedinUrl':
+              value = ''; // Not available in schema
+              break;
+            case 'organizationName':
+              value = row.company?.name || '';
+              break;
+            case 'organizationSize':
+              value = row.company?.size || '';
+              break;
+            case 'organizationSpecialities':
+              value = Array.isArray(row.company?.keywords) ? row.company.keywords.join('; ') : '';
+              break;
+            case 'organizationState':
+              value = ''; // Not available in schema
+              break;
+            case 'organizationWebsite':
+              value = ''; // Not available in schema
+              break;
+            default:
+              value = row[column] || '';
+          }
+          
+          // Handle values with commas or quotes
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+            value = `"${value.replace(/"/g, '""')}"`;
+          }
+          
+          return value;
+        });
+        
+        csvRows.push(values.join(','));
+      });
+
+      const csvContent = csvRows.join('\n');
+
+      // Download file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${type}-export-all-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success(`Exported ${data.length} ${type}`);
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error(`Failed to export ${type}`);
+    }
+  };
+
   const canCreate = can('data:create');
   const canEdit = can('data:edit');
   const canDelete = can('data:delete');
@@ -434,6 +577,12 @@ export default function DataPage() {
                 columns={companiesVisibleColumns}
                 onColumnsChange={handleCompaniesColumnsChange}
               />
+              {canExport && (
+                <Button variant="outline" onClick={() => handleExportAll('companies')}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              )}
               {canImport && (
                 <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
                   <Upload className="h-4 w-4 mr-2" />
@@ -498,6 +647,12 @@ export default function DataPage() {
                 columns={contactsVisibleColumns}
                 onColumnsChange={handleContactsColumnsChange}
               />
+              {canExport && (
+                <Button variant="outline" onClick={() => handleExportAll('contacts')}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+              )}
               {canImport && (
                 <Button variant="outline" onClick={() => setImportDialogOpen(true)}>
                   <Upload className="h-4 w-4 mr-2" />

@@ -22,8 +22,8 @@ export const createContactSchema = z.object({
 export const updateContactSchema = createContactSchema.partial();
 
 export const contactQuerySchema = z.object({
-  page: z.string().optional().transform(val => val ? parseInt(val, 10) : 1),
-  limit: z.string().optional().transform(val => val ? parseInt(val, 10) : 10),
+  page: z.string().nullish().transform(val => val ? parseInt(val, 10) : 1),
+  limit: z.string().nullish().transform(val => val ? parseInt(val, 10) : 10),
   search: z.string().optional().nullable().transform(val => val || undefined),
   companyId: z.string().uuid().optional().nullable().transform(val => val || undefined),
   tags: z.string().optional().nullable().transform(val => val || undefined),

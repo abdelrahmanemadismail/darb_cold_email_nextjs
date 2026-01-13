@@ -26,8 +26,8 @@ export const createCompanySchema = z.object({
 export const updateCompanySchema = createCompanySchema.partial();
 
 export const companyQuerySchema = z.object({
-  page: z.string().optional().transform(val => val ? parseInt(val, 10) : 1),
-  limit: z.string().optional().transform(val => val ? parseInt(val, 10) : 10),
+  page: z.string().nullish().transform(val => val ? parseInt(val, 10) : 1),
+  limit: z.string().nullish().transform(val => val ? parseInt(val, 10) : 10),
   search: z.string().optional().nullable().transform(val => val || undefined),
   source: z.enum(COMPANY_SOURCES).optional().nullable().transform(val => val || undefined),
   sortBy: z.enum(['name', 'createdAt', 'updatedAt']).optional().nullable().transform(val => val || 'createdAt'),

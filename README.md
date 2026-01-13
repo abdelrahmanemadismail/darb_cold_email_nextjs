@@ -34,11 +34,12 @@ This platform is designed for B2B marketing teams to streamline their data colle
 
 ### 🤖 Script Management
 - Apify integration for web scraping
-- Apollo API integration for B2B data
+- **Apollo.io integration** for B2B data collection
 - Script switching mechanism
 - Run logging and execution history
 - Dashboard-based script controls (Start/Stop)
 - Scheduled execution support
+- Automatic data deduplication and updates
 
 ### 📧 Campaign Management
 - Email template builder
@@ -122,6 +123,7 @@ This platform is designed for B2B marketing teams to streamline their data colle
 
    # API Keys (optional)
    APIFY_API_KEY=your-apify-key
+   # Get your Apollo API key from: https://app.apollo.io/#/settings/integrations/api
    APOLLO_API_KEY=your-apollo-key
    ```
 
@@ -164,11 +166,41 @@ Admins can create additional users:
 
 ### Running Scripts
 To collect data from external sources:
-1. Navigate to **Scripts** page
-2. Configure your Apify or Apollo script
+1. Click **"Run Apollo Script"** button
+2. Configure your search criteria:
+   - Job titles (CEO, CTO, etc.)
+   - Company locations
+   - Industries
+   - Company size
+   - Number of pages to scrape
 3. Click "Run Script" to start collection
-4. Monitor progress in real-time
-5. View collected data in the **Data** section
+4. Monitor progress and view collected data in the **Data** section
+
+For detailed Apollo.io integration guide, see [APOLLO_INTEGRATION.md](docs/APOLLO_INTEGRATION.md)
+
+### Enriching Apollo Data
+After running Apollo searches, enrich the results with full contact emails:
+
+#### Via UI (Recommended):
+1. Navigate to **Dashboard** → **Apollo Results**
+2. Click the **"Enrich Data"** button
+3. Wait for the enrichment to complete (toast notification will appear)
+4. Check **Contacts** table for newly added emails
+
+#### Via Command Line:
+```bash
+npm run apollo:enrich
+```
+
+The enrichment process will:
+- ✅ Fetch full contact details including emails
+- ✅ Create/update companies in your database
+- ✅ Create/update contacts with verified emails
+- ✅ Mark results as processed to avoid duplicates
+
+**📚 Detailed Guide**: See [APOLLO_ENRICHMENT.md](docs/APOLLO_ENRICHMENT.md) for complete documentation
+
+**⚡ Quick Reference**: See [APOLLO_ENRICHMENT_QUICK_START.md](docs/APOLLO_ENRICHMENT_QUICK_START.md) for quick commands
 
 ### Creating Campaigns
 To launch an email campaign:

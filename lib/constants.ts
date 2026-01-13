@@ -21,6 +21,11 @@ export const NAV_ITEMS = [
     icon: 'Code',
   },
   {
+    label: 'Apollo Results',
+    href: '/dashboard/apollo-results',
+    icon: 'Database',
+  },
+  {
     label: 'Campaigns',
     href: '/dashboard/campaigns',
     icon: 'Mail',
